@@ -1,0 +1,300 @@
+// Enhanced Sidebar with Labels and Mobile Collapsible
+// Variables from global
+$dark-bg: #050816;
+$primary: #4f46e5;
+$secondary: #06b6d4;
+$text-light: #9ca3af;
+
+// Mobile menu toggle button
+.mobile-menu-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    display: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: $dark-bg;
+    color: #fff;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #111827;
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 1024px) {
+        display: flex;
+    }
+}
+
+// Sidebar overlay for mobile
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    animation: fadeIn 0.2s ease;
+
+    @media (max-width: 1024px) {
+        display: block;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// Enhanced App Shell
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    height: 100vh;
+    position: relative;
+
+    &__sidebar {
+        width: 240px;
+        background: $dark-bg;
+        border-radius: 32px;
+        margin: 16px;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: space-between;
+        row-gap: 24px;
+        transition: transform 0.3s ease, width 0.3s ease;
+        flex-shrink: 0;
+
+        @media (max-width: 1024px) {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            border-radius: 0 32px 32px 0;
+            z-index: 1000;
+            transform: translateX(-100%);
+
+            &--open {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    &__content {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+
+        @media (max-width: 1024px) {
+            padding: 80px 16px 16px;
+        }
+    }
+}
+
+// Sidebar Elements
+.sidebar {
+    &__logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, $primary, $secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0 auto 8px;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+
+    &__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    &__nav-item {
+        min-height: 48px;
+        width: 100%;
+        border-radius: 14px;
+        border: none;
+        background: transparent;
+        color: $text-light;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+        font-family: inherit;
+        position: relative;
+        overflow: hidden;
+        z-index: 0;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-image: linear-gradient(to right, rgba(79, 70, 229, 0.4), rgba(56, 189, 248, 0.4));
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+            z-index: 0;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transform: translateX(4px);
+
+            &::before {
+                transform: scaleY(1);
+            }
+        }
+
+        &--active {
+            background: #111827;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+            &::before {
+                transform: scaleY(1);
+            }
+
+            .sidebar__nav-label {
+                font-weight: 600;
+            }
+        }
+
+        &--bottom {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+        }
+    }
+
+    &__nav-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+    }
+
+    &__nav-label {
+        font-size: 0.9375rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 1;
+        transition: opacity 0.2s ease;
+        flex: 1;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .sidebar {
+        &__logo {
+            width: 44px;
+            height: 44px;
+            font-size: 1.125rem;
+        }
+
+        &__nav-item {
+            padding: 10px 14px;
+            gap: 10px;
+        }
+
+        &__nav-label {
+            font-size: 0.875rem;
+        }
+    }
+}
+
+// Animation for sidebar open/close on mobile
+@media (max-width: 1024px) {
+    .app-shell__sidebar {
+        &--open {
+            animation: slideInFromLeft 0.3s ease forwards;
+        }
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+// Tooltip for collapsed state (future enhancement)
+.sidebar__nav-item {
+    &[data-tooltip] {
+        position: relative;
+
+        &::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 12px;
+            padding: 6px 12px;
+            background: #111827;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1001;
+        }
+
+        &:hover::after {
+            opacity: 1;
+        }
+    }
+}

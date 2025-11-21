@@ -1,18 +1,11 @@
 import React from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTenant } from '../contexts/TenantContext'
+import LoginActions from '../components/auth/LoginActions'
 
 const HomePage: React.FC = () => {
-  const { user, loginWithGoogle } = useAuth()
+  const { user } = useAuth()
   const { tenant } = useTenant()
-
-  const handleGoogleLogin = async (): Promise<void> => {
-    try {
-      await loginWithGoogle()
-    } catch (error) {
-      console.error('Login failed:', error)
-    }
-  }
 
   const displayName = user?.user_metadata?.full_name || user?.email || 'Karla'
 
@@ -40,12 +33,7 @@ const HomePage: React.FC = () => {
         <div className="dashboard__login-banner">
           <p>Login untuk mengakses dashboard lengkap orang tua.</p>
           <div className="dashboard__login-actions">
-            <button onClick={handleGoogleLogin} className="btn btn-primary">
-              Login dengan Google
-            </button>
-            <a href="/auth/login" className="btn btn-outline">
-              Staff Login
-            </a>
+            <LoginActions />
           </div>
         </div>
       )}

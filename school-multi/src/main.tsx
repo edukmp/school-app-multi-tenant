@@ -6,6 +6,8 @@ import App from './App.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { TenantProvider } from './contexts/TenantContext.tsx'
 import './styles/global.scss'
+import './styles/enhanced-sidebar.scss'
+import './components/auth/LoginActions.scss'
 
 const queryClient = new QueryClient()
 
