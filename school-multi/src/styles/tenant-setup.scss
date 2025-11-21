@@ -1,0 +1,647 @@
+// Tenant Setup Styles
+$primary: #4f46e5;
+$secondary: #06b6d4;
+$success: #10b981;
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$text-light: #94a3b8;
+$border-color: #e2e8f0;
+$bg-light: #f8fafc;
+$bg-card: #ffffff;
+$shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+$shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+$shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
+
+.tenant-setup {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  &__container {
+    max-width: 1000px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+// Progress Steps
+.setup-progress {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &__steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    &--completed {
+      .setup-progress__step-icon {
+        background: $success;
+        border-color: $success;
+      }
+    }
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 2rem;
+      left: calc(100% - 1rem);
+      width: calc(100% + 0.5rem);
+      height: 2px;
+      background: rgba(255, 255, 255, 0.3);
+      
+      @media (max-width: 768px) {
+        display: none;
+      }
+    }
+  }
+
+  &__step-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+
+    .setup-progress__step--active & {
+      background: $primary;
+      border-color: $primary;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+    }
+  }
+
+  &__step-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+
+  &__step-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+// Setup Card
+.setup-card {
+  background: $bg-card;
+  border-radius: 24px;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+
+  &__header {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    padding: 2.5rem;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.5rem;
+  }
+
+  &__subtitle {
+    font-size: 1rem;
+    color: $text-muted;
+    margin: 0;
+  }
+
+  &__body {
+    padding: 2.5rem;
+    min-height: 400px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2.5rem;
+    background: $bg-light;
+    border-top: 1px solid $border-color;
+  }
+
+  &__footer-actions {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+// Form Styles
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: $text-dark;
+
+    .required {
+      color: #ef4444;
+      margin-left: 0.25rem;
+    }
+  }
+
+  &__input,
+  &__textarea {
+    padding: 0.875rem 1rem;
+    border: 2px solid $border-color;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #fff;
+    color: $text-dark;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-light;
+    }
+  }
+
+  &__textarea {
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0;
+  }
+
+  // Toggle Buttons
+  &__toggle {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: $bg-light;
+    border-radius: 12px;
+  }
+
+  &__toggle-btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    font-weight: 600;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &--active {
+      background: #fff;
+      color: $primary;
+      border-color: $primary;
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  // Action Box
+  &__action-box {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border: 2px solid #c7d2fe;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  &__action-box-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  &__action-box-icon {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.75rem;
+    background: $primary;
+    color: #fff;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  &__action-box-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.25rem;
+  }
+
+  &__action-box-text {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0;
+  }
+
+  // Success Message
+  &__success-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid #6ee7b7;
+    border-radius: 12px;
+    color: #065f46;
+    font-weight: 600;
+    animation: slideIn 0.3s ease;
+  }
+
+  // Info Box
+  &__info-box {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__info-box-icon {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.75rem;
+    background: $secondary;
+    color: #fff;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  &__info-box-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.25rem;
+  }
+
+  &__info-box-text {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0;
+  }
+
+  // Checkbox Card
+  &__checkbox-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 2px solid $border-color;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $primary;
+      background: #f8fafc;
+    }
+
+    &:has(input:checked) {
+      border-color: $primary;
+      background: #eef2ff;
+    }
+  }
+
+  &__checkbox {
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    accent-color: $primary;
+    flex-shrink: 0;
+  }
+
+  &__checkbox-label {
+    flex: 1;
+    cursor: pointer;
+  }
+
+  &__checkbox-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.25rem;
+  }
+
+  &__checkbox-text {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0;
+  }
+
+  // Preview
+  &__preview {
+    background: $bg-light;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  &__preview-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 1rem;
+  }
+
+  &__preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: $text-muted;
+
+      svg {
+        color: $success;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // Optional Badge
+  &__optional-badge {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: #78350f;
+    font-size: 0.9rem;
+  }
+
+  // File Upload
+  &__file-upload {
+    position: relative;
+  }
+
+  &__file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  &__file-label {
+    display: block;
+    cursor: pointer;
+  }
+
+  &__file-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem;
+    border: 2px dashed $border-color;
+    border-radius: 16px;
+    background: $bg-light;
+    transition: all 0.2s ease;
+    text-align: center;
+
+    &:hover {
+      border-color: $primary;
+      background: #f8fafc;
+    }
+
+    svg {
+      color: $text-light;
+    }
+
+    span {
+      font-size: 0.9rem;
+      color: $text-muted;
+      font-weight: 500;
+    }
+  }
+
+  &__file-hint {
+    font-size: 0.8rem !important;
+    color: $text-light !important;
+  }
+
+  &__file-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__file-preview-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid $border-color;
+  }
+}
+
+// Button Styles
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &-primary {
+    background: linear-gradient(135deg, $primary 0%, #6366f1 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  &-secondary {
+    background: linear-gradient(135deg, $secondary 0%, #0891b2 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    }
+  }
+
+  &-success {
+    background: linear-gradient(135deg, $success 0%, #059669 100%) !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  }
+
+  &-outline {
+    background: #fff;
+    border-color: $border-color;
+    color: $text-dark;
+
+    &:hover:not(:disabled) {
+      border-color: $primary;
+      color: $primary;
+      background: #f8fafc;
+    }
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .tenant-setup {
+    padding: 1rem;
+  }
+
+  .setup-card {
+    &__header,
+    &__body,
+    &__footer {
+      padding: 1.5rem;
+    }
+
+    &__title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .setup-progress {
+    padding: 1.5rem;
+  }
+}

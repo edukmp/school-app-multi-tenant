@@ -170,7 +170,7 @@ body {
 		margin-bottom: 24px;
 		font-size: 14px;
 
-		& > .dashboard__login-actions {
+		&>.dashboard__login-actions {
 			display: flex;
 			gap: 8px;
 		}
@@ -1097,3 +1097,6 @@ body {
 		}
 	}
 }
+
+// Import tenant setup styles
+@import './tenant-setup.scss';

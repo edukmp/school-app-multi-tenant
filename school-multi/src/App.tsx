@@ -17,6 +17,7 @@ import PaymentUploadPage from './pages/parent/PaymentUploadPage'
 import StudentBindingPage from './pages/parent/StudentBindingPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import SuperAdminDashboard from './pages/super-admin/Dashboard'
+import TenantSetup from './pages/tenant/TenantSetup'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
 const App: React.FC = () => {
@@ -37,6 +38,8 @@ const App: React.FC = () => {
             <Route path="google-callback" element={<GoogleAuthCallback />} />
           </Route>
         </Route>
+        {/* Tenant Setup - Accessible for super admin or during initial setup */}
+        <Route path="/tenant/setup" element={<TenantSetup />} />
         {/* Super Admin Routes */}
         {user?.role === 'super_admin' && (
           <Route path="/super-admin" element={<SuperAdminLayout />}>
