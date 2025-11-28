@@ -6,7 +6,18 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    host: true
+    host: '0.0.0.0',
+    strictPort: false,
+    allowedHosts: [
+      'hyetal-unfiscally-voncile.ngrok-free.dev',
+      '.ngrok-free.dev',
+      '.ngrok.io',
+      'localhost'
+    ],
+    hmr: {
+      clientPort: 443,
+      protocol: 'wss'
+    }
   },
   resolve: {
     alias: {

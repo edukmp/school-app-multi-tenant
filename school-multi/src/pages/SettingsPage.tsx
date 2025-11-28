@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { User, Bell, Lock, Globe, Moon, Mail, Shield, Database, Save } from 'lucide-react'
+import { User, Bell, Lock, Moon, Mail, Shield, Database, Save } from 'lucide-react'
 
 const SettingsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('profile')

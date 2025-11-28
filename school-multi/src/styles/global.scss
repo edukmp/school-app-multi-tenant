@@ -1,3 +1,6 @@
+@use 'tenant-setup';
+@use 'landing-page';
+
 // Global variables
 $bg-color: #eef1f8;
 $shell-bg: #f6f7fb;
@@ -1130,11 +1133,9 @@ body {
 						border-radius: 8px;
 					}
 				}
+
+				margin: 0;
 			}
 		}
 	}
 }
-
-// Import tenant setup styles
-@import 'tenant-setup.scss';
-@import 'landing-page.scss';

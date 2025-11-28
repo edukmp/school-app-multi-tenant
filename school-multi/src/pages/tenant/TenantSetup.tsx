@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Check, Database, Mail, Settings, ArrowRight, ArrowLeft } from 'lucide-react'
+import { supabase } from '../../services/supabase'
 import '../../styles/tenant-setup.scss'
 
 interface SetupStep {
@@ -88,11 +89,47 @@ const TenantSetup: React.FC = () => {
     }
 
     const handleSendResetLink = async () => {
+        if (!setupData.email || !setupData.tempPassword) return
+
         setIsSubmitting(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        setEmailSent(true)
-        setIsSubmitting(false)
+        try {
+            const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin
+
+            // 1. Try to sign up the user first with temp password
+            const { error: signUpError } = await supabase.auth.signUp({
+                email: setupData.email,
+                password: setupData.tempPassword,
+                options: {
+                    data: {
+                        role: 'admin' // Default role for tenant manager
+                    },
+                    emailRedirectTo: `${redirectUrl}/auth/login`
+                }
+            })
+
+            if (signUpError) {
+                // If user already exists, we proceed to send reset link
+                // Otherwise throw error
+                if (!signUpError.message.toLowerCase().includes('already registered')) {
+                    throw signUpError
+                }
+            }
+
+            // 2. Send password reset email to force password change
+            const { error: resetError } = await supabase.auth.resetPasswordForEmail(setupData.email, {
+                redirectTo: `${redirectUrl}/auth/reset-password`,
+            })
+
+            if (resetError) throw resetError
+
+            setEmailSent(true)
+            // alert(`Akun berhasil diproses. Link reset password telah dikirim ke ${setupData.email}.`)
+        } catch (error) {
+            console.error('Error handling tenant account:', error)
+            alert('Gagal memproses akun tenant. ' + (error instanceof Error ? error.message : ''))
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const validateStep = (step: number): boolean => {

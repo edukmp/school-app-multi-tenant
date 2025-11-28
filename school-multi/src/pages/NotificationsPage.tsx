@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Bell, Check, Trash2, Filter, Mail, Calendar, AlertCircle, Info } from 'lucide-react'
+import { Bell, Check, Trash2, AlertCircle, Info } from 'lucide-react'
 
 interface Notification {
     id: string

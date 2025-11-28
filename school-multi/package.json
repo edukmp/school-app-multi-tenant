@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tunnel": "ngrok http --domain=hyetal-unfiscally-voncile.ngrok-free.dev --scheme=http 5173"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
@@ -28,9 +29,10 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
-    "typescript-eslint": "^8.47.0",
+    "ngrok": "^5.0.0-beta.2",
     "sass-embedded": "^1.93.3",
     "typescript": "^5.2.2",
+    "typescript-eslint": "^8.47.0",
     "vite": "^7.2.2",
     "vite-tsconfig-paths": "^4.2.1"
   }

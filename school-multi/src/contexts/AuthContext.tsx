@@ -2,14 +2,16 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { supabase } from '../services/supabase'
 import { User } from '../types'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
-import { SUPER_ADMINS, mapSupabaseUser } from './authHelpers'
+import { mapSupabaseUser } from './authHelpers'
 
 interface AuthContextType {
   user: User | null
   loading: boolean
   loginWithGoogle: () => Promise<void>
   loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  registerWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -22,78 +24,120 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
-  // Define createUserProfile before it's used in useEffect
-  const createUserProfile = async (user: SupabaseUser): Promise<void> => {
+  // Helper to fetch profile role and merge with user
+  const fetchProfileAndSetUser = async (supabaseUser: SupabaseUser) => {
     try {
-      // Check if profile exists
-      const { data: existingProfile, error: fetchError } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', user.id)
+        .select('role, name, avatar_url')
+        .eq('id', supabaseUser.id)
         .single()
 
-      // Ignore error if it's just "not found" (PGRST116) which means we need to create it
-      // But if it's a 404 (table not found), we should catch it
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.warn('Error checking profile (table might be missing):', fetchError)
-        return
-      }
+      const mappedUser = mapSupabaseUser(supabaseUser)
 
-      if (!existingProfile) {
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: user.id,
-              email: user.email,
-              name: user.user_metadata?.full_name || user.email,
-              avatar_url: user.user_metadata?.avatar_url,
-              created_at: new Date().toISOString()
-            }
-          ])
-
-        if (insertError) {
-          console.warn('Error creating profile:', insertError)
+      if (mappedUser) {
+        if (profile && !error) {
+          mappedUser.role = profile.role as User['role']
+          if (!mappedUser.user_metadata) mappedUser.user_metadata = {}
+          if (profile.name) mappedUser.user_metadata.full_name = profile.name
+          if (profile.avatar_url) mappedUser.user_metadata.avatar_url = profile.avatar_url
         }
+        setUser(mappedUser)
       }
+    } catch (err) {
+      console.error('Error fetching profile:', err)
+      setUser(mapSupabaseUser(supabaseUser))
+    }
+  }
+
+  // Use upsert to create or update profile
+  const createUserProfile = async (user: SupabaseUser): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email,
+            avatar_url: user.user_metadata?.avatar_url,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: 'id', ignoreDuplicates: true }
+        )
+      if (error) console.warn('Error upserting profile:', error)
     } catch (error) {
-      console.warn('Exception in createUserProfile (likely missing table):', error)
+      console.warn('Exception in createUserProfile:', error)
     }
   }
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(mapSupabaseUser(session?.user ?? null))
-      setLoading(false)
-    })
+    // Get initial session with timeout
+    const initSession = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Session init timeout')), 5000)
+        )
+
+        const sessionPromise = supabase.auth.getSession()
+
+        const result = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as { data: { session: any } }
+
+        const session = result.data?.session
+
+        if (session?.user) {
+          await fetchProfileAndSetUser(session.user)
+        } else {
+          setUser(null)
+        }
+      } catch (error) {
+        console.warn('Auth initialization warning:', error)
+        setUser(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initSession()
 
     // Listen for auth changes
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(mapSupabaseUser(session?.user ?? null))
-      setLoading(false)
-
-      // If signed in, create/update user profile
-      if (session?.user && event === 'SIGNED_IN') {
-        await createUserProfile(session.user)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        if (event === 'SIGNED_IN') {
+          await createUserProfile(session.user)
+          await fetchProfileAndSetUser(session.user)
+        } else if (event === 'TOKEN_REFRESHED') {
+          await fetchProfileAndSetUser(session.user)
+        } else {
+          setUser(mapSupabaseUser(session.user))
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
       }
+      setLoading(false)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
+  const refreshProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      await fetchProfileAndSetUser(session.user)
+    }
+  }
+
   const loginWithGoogle = async (): Promise<void> => {
     try {
+      const redirectUrl = import.meta.env.VITE_APP_URL || window.location.origin
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          },
-          redirectTo: `${window.location.origin}/auth/google-callback`
+          queryParams: { access_type: 'offline', prompt: 'consent' },
+          redirectTo: `${redirectUrl}/auth/google-callback`
         }
       })
       if (error) throw error
@@ -103,45 +147,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const loginWithEmail = async (
-    email: string,
-    password: string
-  ): Promise<{ success: boolean; error?: string }> => {
+  const registerWithEmail = async (email: string, password: string) => {
     try {
-      const superAdmin = SUPER_ADMINS.find(admin => admin.email === email && admin.password === password)
-
-      if (superAdmin) {
-        const mockSuperAdmin: User = {
-          id: 'super-admin-1',
-          email: superAdmin.email,
-          user_metadata: { full_name: superAdmin.name },
-          role: 'super_admin'
-        }
-
-        setUser(mockSuperAdmin)
-        return { success: true }
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-
+      const { data, error } = await supabase.auth.signUp({ email, password })
       if (error) throw error
-
-      setUser(mapSupabaseUser(data.user) ?? null)
+      if (data.user) {
+        await createUserProfile(data.user)
+        await fetchProfileAndSetUser(data.user)
+      }
       return { success: true }
     } catch (error) {
-      console.error('Login error:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Login failed'
-      }
+      return { success: false, error: error instanceof Error ? error.message : 'Registration failed' }
+    }
+  }
+
+  const loginWithEmail = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      if (data.user) await fetchProfileAndSetUser(data.user)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Login failed' }
     }
   }
 
   const logout = async (): Promise<void> => {
-    await supabase.auth.signOut()
+    try {
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Logout timed out')), 3000))
+      await Promise.race([supabase.auth.signOut(), timeoutPromise])
+    } catch (error) {
+      console.error('Logout warning:', error)
+    } finally {
+      setUser(null)
+      try {
+        const supabaseKey = `sb-${new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0]}-auth-token`
+        localStorage.removeItem(supabaseKey)
+      } catch (e) { console.warn('Could not clear local storage key', e) }
+    }
   }
 
   const value: AuthContextType = {
@@ -149,7 +192,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     loginWithGoogle,
     loginWithEmail,
-    logout
+    registerWithEmail,
+    logout,
+    refreshProfile
   }
 
   return (
@@ -159,11 +204,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider')
   return context
 }

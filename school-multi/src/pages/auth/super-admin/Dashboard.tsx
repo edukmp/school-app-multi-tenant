@@ -118,7 +118,10 @@ const SuperAdminDashboard: React.FC = () => {
       <div className="tenants-section">
         <div className="section-header">
           <h2>Managed Schools</h2>
-          <button className="btn btn-primary">
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate('/tenant/setup')}
+          >
             + Add New School
           </button>
         </div>
@@ -128,12 +131,12 @@ const SuperAdminDashboard: React.FC = () => {
             <div key={tenant.id} className="tenant-card">
               <div className="tenant-header">
                 <h3>{tenant.name}</h3>
-                <span 
-                  className="tenant-color" 
+                <span
+                  className="tenant-color"
                   style={{ backgroundColor: tenant.theme_config.primaryColor }}
                 ></span>
               </div>
-              
+
               <div className="tenant-details">
                 <p><strong>Subdomain:</strong> {tenant.subdomain}.sekolahku.com</p>
                 <p><strong>Active Modules:</strong> {tenant.active_modules.join(', ')}</p>
