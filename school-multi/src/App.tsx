@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import { useTenant } from './contexts/TenantContext'
 // Layout Components
@@ -27,10 +27,26 @@ import TenantSetup from './pages/tenant/TenantSetup'
 import TenantOnboarding from './pages/tenant/TenantOnboarding'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
+// Helper component for admin route protection
+const AdminRoute = ({ user }: { user: any }) => {
+  if (user?.role === 'admin') {
+    return <AdminDashboard />;
+  }
+  return <Navigate to="/auth/tenant-login" replace />;
+};
+
 const App: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const { tenant, loading: tenantLoading } = useTenant()
   const location = useLocation()
+  const navigate = useNavigate()
+
+  // Auto-redirect admin users to onboarding if not already there
+  React.useEffect(() => {
+    if (!authLoading && user?.role === 'admin' && !location.pathname.startsWith('/tenant/onboarding') && !location.pathname.startsWith('/admin')) {
+      navigate('/tenant/onboarding', { replace: true })
+    }
+  }, [user, authLoading, location.pathname, navigate])
 
   if (authLoading || tenantLoading) {
     return <LoadingSpinner />
@@ -69,21 +85,19 @@ const App: React.FC = () => {
           <Route path="notifications" element={<NotificationsPage />} />
         </Route>
 
-        {/* Tenant Setup - Accessible for super admin or during initial setup */}
-        <Route path="/tenant/setup" element={<TenantSetup />} />
-
-        {/* Tenant Onboarding - Accessible for tenant admin after login */}
-        <Route path="/tenant/onboarding" element={<TenantOnboarding />} />
-
-        {/* Super Admin Routes */}
+        {/* SUPER ADMIN ROUTES */}
         {user?.role === 'super_admin' && (
-          <Route path="/super-admin" element={<SuperAdminLayout />}>
-            <Route index element={<SuperAdminDashboard />} />
-            {/* Tambah routes super admin lainnya di sini */}
-          </Route>
+          <>
+            {/* Tenant Setup is now exclusive to Super Admin */}
+            <Route path="/tenant/setup" element={<TenantSetup />} />
+
+            <Route path="/super-admin" element={<SuperAdminLayout />}>
+              <Route index element={<SuperAdminDashboard />} />
+            </Route>
+          </>
         )}
 
-        {/* Parent Routes */}
+        {/* PARENT ROUTES */}
         {user?.role === 'parent' && (
           <Route path="/parent" element={<AuthLayout />}>
             <Route index element={<ParentDashboard />} />
@@ -92,12 +106,17 @@ const App: React.FC = () => {
           </Route>
         )}
 
-        {/* Admin Routes */}
-        {user?.role === 'admin' && (
-          <Route path="/admin" element={<AuthLayout />}>
-            <Route index element={<AdminDashboard />} />
-          </Route>
-        )}
+        {/* ADMIN (TENANT) ROUTES */}
+
+        {/* Onboarding is protected for admins */}
+        <Route path="/tenant/onboarding" element={
+          user?.role === 'admin' ? <TenantOnboarding /> : <Navigate to="/auth/tenant-login" replace />
+        } />
+
+        {/* Admin Dashboard */}
+        <Route path="/admin" element={<AuthLayout />}>
+          <Route index element={<AdminRoute user={user} />} />
+        </Route>
 
         {/* 404 Route */}
         <Route path="*" element={<div>404 - Page Not Found</div>} />

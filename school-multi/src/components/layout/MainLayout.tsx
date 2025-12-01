@@ -54,8 +54,6 @@ const MainLayout: React.FC = () => {
       await logout()
       console.log('Logout completed successfully')
       closeSidebarOnMobile()
-      // Force redirect to home
-      window.location.href = '/'
     } catch (error) {
       console.error('Error during logout:', error)
       alert('Logout failed. Please try again.')

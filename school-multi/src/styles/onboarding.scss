@@ -1,0 +1,583 @@
+/* Tenant Onboarding Wizard Styles - Step Progress Layout */
+.onboarding-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.onboarding-wizard {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.onboarding-header {
+    background: white;
+    padding: 2.5rem 2rem 1rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.onboarding-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+}
+
+.onboarding-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+/* Step Progress Indicator */
+.step-progress-container {
+    padding: 2rem 3rem;
+    background: white;
+}
+
+.step-progress {
+    display: flex;
+    flex-direction: row;
+    /* FORCE HORIZONTAL */
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 3rem;
+    width: 100%;
+}
+
+.step-progress::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #e5e7eb;
+    z-index: 0;
+}
+
+.step-progress-line {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.4s ease;
+    z-index: 1;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
+}
+
+.step-item.active .step-circle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transform: scale(1.1);
+}
+
+.step-item.completed .step-circle {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.step-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.step-icon {
+    margin-bottom: 0.25rem;
+    color: #9ca3af;
+    transition: color 0.3s ease;
+}
+
+.step-item.active .step-icon {
+    color: #667eea;
+}
+
+.step-item.completed .step-icon {
+    color: #10b981;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.step-item.active .step-title {
+    color: #667eea;
+    font-weight: 700;
+}
+
+.step-item.completed .step-title {
+    color: #10b981;
+}
+
+.onboarding-content {
+    padding: 0 3rem 2rem 3rem;
+    min-height: 400px;
+}
+
+.onboarding-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.onboarding-content>p {
+    color: #6b7280;
+    margin: 0 0 2rem 0;
+    font-size: 0.95rem;
+}
+
+.config-mode-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.mode-button {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.mode-button:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.mode-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-field input,
+.form-field textarea {
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-field textarea {
+    font-family: 'Courier New', monospace;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.checkbox-option:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.checkbox-option input[type="checkbox"] {
+    margin-top: 0.25rem;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-option label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.checkbox-option p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.install-button {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.install-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.install-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.progress-bar-container {
+    padding: 2rem 0;
+}
+
+.progress-bar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    transition: width 0.5s ease;
+    border-radius: 9999px;
+}
+
+.progress-status {
+    text-align: center;
+    font-weight: 600;
+    color: #374151;
+    font-size: 1rem;
+}
+
+.progress-complete {
+    text-align: center;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.branding-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+}
+
+.color-picker-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.color-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.color-picker input[type="color"] {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+}
+
+.color-picker span {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.file-input {
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    color: #6b7280;
+    padding: 0.75rem;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-input:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.file-input::file-selector-button {
+    margin-right: 1rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-input::file-selector-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.module-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.module-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.module-checkbox:hover {
+    background: #f0f4ff;
+    border-color: #667eea;
+}
+
+.module-checkbox input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.module-checkbox span {
+    font-weight: 500;
+    color: #374151;
+}
+
+.onboarding-footer {
+    background: #f9fafb;
+    padding: 2rem 3rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-button {
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.footer-button.back {
+    border: 2px solid #d1d5db;
+    background: white;
+    color: #374151;
+}
+
+.footer-button.back:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.footer-button.next {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.footer-button.next:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.footer-button.finish {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.footer-button.finish:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.footer-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.footer-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@media (max-width: 768px) {
+    .onboarding-container {
+        padding: 1rem;
+    }
+
+    .step-progress-container {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .onboarding-content {
+        padding: 0 1rem 1.5rem 1rem;
+    }
+
+    .onboarding-footer {
+        padding: 1.5rem;
+    }
+
+    .form-grid,
+    .branding-grid,
+    .color-picker-group {
+        grid-template-columns: 1fr;
+    }
+
+    /* Keep horizontal layout but scale down elements for smaller screens */
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.875rem;
+        border-width: 2px;
+    }
+
+    .step-progress::before,
+    .step-progress-line {
+        top: 16px;
+        /* Adjust for smaller circle (32px / 2) */
+        height: 2px;
+    }
+
+    .step-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .step-title {
+        font-size: 0.75rem;
+    }
+
+    /* Ensure labels don't overlap too much */
+    .step-label {
+        padding: 0 0.25rem;
+    }
+}
