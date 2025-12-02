@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Database, Download, Terminal, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Database, Download, Terminal, CheckCircle, AlertCircle, ExternalLink, Lightbulb, XCircle } from 'lucide-react'
 import '../../styles/setup-guide.scss'
 
 const DatabaseSetupGuide: React.FC = () => {
@@ -68,7 +68,9 @@ const DatabaseSetupGuide: React.FC = () => {
                             </div>
 
                             <div className="info-box tip">
-                                <strong>💡 Tip:</strong> Choose the "Windows x86-64" installer from EnterpriseDB. The file will be around 200-300MB.
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Lightbulb size={18} /> Tip:
+                                </strong> Choose the "Windows x86-64" installer from EnterpriseDB. The file will be around 200-300MB.
                             </div>
                         </div>
                     </section>
@@ -242,7 +244,10 @@ const DatabaseSetupGuide: React.FC = () => {
                             </div>
 
                             <div className="info-box tip">
-                                <strong>💡 Next Step:</strong> Go back to the setup wizard and enter these details in the Database Configuration form, then click "Test Database Connection".
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Lightbulb size={18} /> Next Step:
+                                </strong>
+                                Go back to the setup wizard and enter these details in the Database Configuration form, then click "Test Database Connection".
                             </div>
                         </div>
                     </section>
@@ -256,22 +261,30 @@ const DatabaseSetupGuide: React.FC = () => {
 
                         <div className="troubleshooting-list">
                             <div className="trouble-item">
-                                <strong>❌ "psql is not recognized as a command"</strong>
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <XCircle size={18} /> "psql is not recognized as a command"
+                                </strong>
                                 <p><strong>Solution:</strong> PostgreSQL command line tools are not in your PATH. Use pgAdmin instead, or add PostgreSQL to your system PATH.</p>
                             </div>
 
                             <div className="trouble-item">
-                                <strong>❌ "Connection refused" or "Server not running"</strong>
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <XCircle size={18} /> "Connection refused" or "Server not running"
+                                </strong>
                                 <p><strong>Solution:</strong> PostgreSQL service is not running. Open Services (<code>services.msc</code>), find "postgresql-x64-16", right-click and select "Start".</p>
                             </div>
 
                             <div className="trouble-item">
-                                <strong>❌ "Password authentication failed"</strong>
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <XCircle size={18} /> "Password authentication failed"
+                                </strong>
                                 <p><strong>Solution:</strong> You're using the wrong password. Try resetting the postgres user password using pgAdmin or reinstall PostgreSQL.</p>
                             </div>
 
                             <div className="trouble-item">
-                                <strong>❌ "Database already exists"</strong>
+                                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <XCircle size={18} /> "Database already exists"
+                                </strong>
                                 <p><strong>Solution:</strong> The database <code>school_db</code> was already created. You can use it as-is, or delete it first and create a new one.</p>
                             </div>
                         </div>

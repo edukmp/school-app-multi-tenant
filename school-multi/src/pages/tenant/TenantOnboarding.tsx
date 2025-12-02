@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { Database, Server, Palette, CheckCircle, Layout, ArrowRight, ArrowLeft, Loader, LogOut } from 'lucide-react'
+﻿import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Database, Server, Palette, HelpCircle, CheckCircle, Layout, ArrowRight, ArrowLeft, Loader, LogOut, Tool, XCircle, Lightbulb } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
+import DatabaseSetupHelpBanner from '../../components/common/DatabaseSetupHelpBanner'
 import '../../styles/onboarding.scss'
 
 interface OnboardingData {
@@ -283,6 +285,8 @@ const TenantOnboarding: React.FC = () => {
                         <div>
                             <h2>Database Configuration</h2>
                             <p>Configure where your school's data will be stored.</p>
+                            <DatabaseSetupHelpBanner />
+
 
                             <div className="config-mode-selector">
                                 <button
@@ -380,7 +384,7 @@ const TenantOnboarding: React.FC = () => {
                                     ) : connectionTest.status === 'success' ? (
                                         <>
                                             <CheckCircle size={18} />
-                                            Connection Verified ✓
+                                            Connection Verified “
                                         </>
                                     ) : (
                                         <>
@@ -412,7 +416,7 @@ const TenantOnboarding: React.FC = () => {
                                             connectionTest.status === 'error' ? '#991b1b' : '#3730a3'
                                     }}>
                                         {connectionTest.status === 'success' && <CheckCircle size={20} />}
-                                        {connectionTest.status === 'error' && <span style={{ fontSize: '1.25rem' }}>❌</span>}
+                                        {connectionTest.status === 'error' && <XCircle size={20} />}
                                         {connectionTest.status === 'testing' && <Loader size={20} style={{ animation: 'spin 1s linear infinite' }} />}
                                         <span>{connectionTest.message}</span>
                                     </div>
@@ -459,7 +463,7 @@ const TenantOnboarding: React.FC = () => {
                                         marginBottom: '0.75rem',
                                         fontSize: '0.875rem'
                                     }}>
-                                        🔧 Troubleshooting Steps:
+                                        ðŸ”§ Troubleshooting Steps:
                                     </div>
                                     <ol style={{
                                         fontSize: '0.8125rem',
@@ -644,3 +648,5 @@ const TenantOnboarding: React.FC = () => {
 }
 
 export default TenantOnboarding
+
+

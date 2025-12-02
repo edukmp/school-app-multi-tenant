@@ -26,6 +26,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import SuperAdminDashboard from './pages/super-admin/Dashboard'
 import TenantSetup from './pages/tenant/TenantSetup'
 import TenantOnboarding from './pages/tenant/TenantOnboarding'
+import DatabaseSetupGuide from './pages/tenant/DatabaseSetupGuide'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
 // Helper component for admin route protection
@@ -105,6 +106,9 @@ const App: React.FC = () => {
         <Route path="/tenant/onboarding" element={
           user?.role === 'admin' ? <TenantOnboarding /> : <Navigate to="/auth/tenant-login" replace />
         } />
+
+        {/* Database Setup Guide - Public */}
+        <Route path="/help/database-setup" element={<DatabaseSetupGuide />} />
 
         {/* Admin Dashboard */}
         <Route path="/admin" element={<AuthLayout />}>
