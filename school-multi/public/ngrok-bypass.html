@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngrok Bypass - School App</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0 0 1rem;
+            font-size: 2rem;
+        }
+
+        p {
+            margin: 0 0 1.5rem;
+            opacity: 0.9;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .manual-link {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 Loading School App...</h1>
+        <p>Bypassing Ngrok warning page...</p>
+        <div class="loader"></div>
+        <div class="manual-link">
+            <p style="font-size: 0.9rem;">If not redirected automatically:</p>
+            <a href="https://hyetal-unfiscally-voncile.ngrok-free.dev" id="manual-link">Click here to open manually</a>
+        </div>
+    </div>
+
+    <script>
+        // Method 1: Try to open with custom header (won't work due to CORS, but worth trying)
+        async function tryBypass() {
+            try {
+                const response = await fetch('https://hyetal-unfiscally-voncile.ngrok-free.dev', {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+
+                if (response.ok) {
+                    // If successful, redirect
+                    window.location.href = 'https://hyetal-unfiscally-voncile.ngrok-free.dev';
+                }
+            } catch (e) {
+                // Fetch will fail due to CORS, fallback to iframe method
+                useIframeMethod();
+            }
+        }
+
+        // Method 2: Use iframe to pre-load and accept the warning
+        function useIframeMethod() {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'https://hyetal-unfiscally-voncile.ngrok-free.dev';
+            document.body.appendChild(iframe);
+
+            // Wait 2 seconds then redirect
+            setTimeout(() => {
+                window.location.href = 'https://hyetal-unfiscally-voncile.ngrok-free.dev';
+            }, 2000);
+        }
+
+        // Method 3: Direct redirect (simplest, user clicks "Visit Site" once)
+        function directRedirect() {
+            setTimeout(() => {
+                window.location.href = 'https://hyetal-unfiscally-voncile.ngrok-free.dev';
+            }, 1500);
+        }
+
+        // Start bypass attempt
+        directRedirect();
+    </script>
+</body>
+
+</html>

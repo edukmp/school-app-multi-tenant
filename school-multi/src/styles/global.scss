@@ -531,12 +531,12 @@ body {
 
 .stat-card {
 	background: white;
-	padding: 1.5rem;
+	padding: 1rem;
 	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);
 	display: flex;
 	align-items: center;
-	gap: 1rem;
+	// gap: 1rem;
 	flex-direction: column;
 }
 
