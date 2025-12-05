@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 import { Tenant } from '../types'
+import { supabase } from '../services/supabase'
+import { generateThemePalette, applyThemePalette } from '../utils/colorTheming'
 
 interface TenantContextType {
   tenant: Tenant | null
   loading: boolean
+  error: string | null
   setTenant: (tenant: Tenant) => void
+  refreshTenant: () => Promise<void>
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined)
@@ -16,18 +20,103 @@ interface TenantProviderProps {
 export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const applyTenantTheme = (tenant: Tenant): void => {
+    if (tenant.theme_config) {
+      const primaryColor = tenant.theme_config.primaryColor || tenant.theme_config.primary_color
+      const secondaryColor = tenant.theme_config.secondaryColor || tenant.theme_config.secondary_color
+
+      if (primaryColor && secondaryColor) {
+        console.log('🎨 Generating theme palette from:', { primaryColor, secondaryColor })
+
+        // Generate comprehensive color palette
+        const palette = generateThemePalette(primaryColor, secondaryColor)
+
+        // Apply to CSS variables (including logo)
+        applyThemePalette(palette, tenant.theme_config.logo)
+
+        console.log('✅ Theme palette applied:', palette)
+      } else {
+        console.warn('⚠️ Missing primary or secondary color in theme config')
+      }
+    }
+  }
+
+  const fetchTenantFromSupabase = async (userId: string): Promise<Tenant | null> => {
+    try {
+      // 1. Get tenant_id from user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) {
+        // It's possible the profile doesn't exist yet or doesn't have tenant_id
+        console.warn('Could not fetch profile for tenant detection:', profileError.message)
+        return null
+      }
+
+      if (!profile?.tenant_id) {
+        return null
+      }
+
+      // 2. Fetch tenant details
+      const { data: tenantData, error: tenantError } = await supabase
+        .from('tenants')
+        .select('*')
+        .eq('id', profile.tenant_id)
+        .single()
+
+      if (tenantError) {
+        throw tenantError
+      }
+
+      if (tenantData) {
+        return {
+          id: tenantData.id,
+          name: tenantData.name,
+          subdomain: tenantData.subdomain,
+          theme_config: tenantData.theme_config || {},
+          active_modules: tenantData.active_modules || []
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching tenant from Supabase:', err)
+      return null
+    }
+    return null
+  }
 
   const detectTenant = useCallback(async (): Promise<void> => {
-    try {
-      // Try to load from localStorage first (from onboarding)
-      const savedTenant = localStorage.getItem('tenant_config')
+    setLoading(true)
+    setError(null)
 
-      if (savedTenant) {
-        const parsedTenant = JSON.parse(savedTenant)
-        setTenant(parsedTenant)
-        applyTenantTheme(parsedTenant)
-      } else {
-        // Fallback to demo tenant if no config found
+    try {
+      let foundTenant: Tenant | null = null
+
+      // Strategy 1: Check authenticated user
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        foundTenant = await fetchTenantFromSupabase(session.user.id)
+      }
+
+      // Strategy 2: Check localStorage (Onboarding/Dev Config)
+      if (!foundTenant) {
+        const savedTenant = localStorage.getItem('tenant_config')
+        if (savedTenant) {
+          try {
+            foundTenant = JSON.parse(savedTenant)
+          } catch (e) {
+            console.error('Failed to parse (tenant_config) from localStorage', e)
+          }
+        }
+      }
+
+      // Strategy 3: Mock/Demo Fallback (if no other tenant found)
+      // Only verify against checking a 'public' landing page or similar in future
+      if (!foundTenant) {
         const mockTenant: Tenant = {
           id: 'demo',
           name: 'Sekolah Demo',
@@ -38,13 +127,19 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
           },
           active_modules: ['academic', 'payment', 'meeting']
         }
-
-        setTenant(mockTenant)
-        applyTenantTheme(mockTenant)
+        foundTenant = mockTenant
       }
-    } catch (error) {
-      console.error('Tenant detection failed:', error)
-      // Fallback tenant
+
+      if (foundTenant) {
+        setTenant(foundTenant)
+        applyTenantTheme(foundTenant)
+      }
+
+    } catch (error: any) {
+      console.error('Tenant detection check failed:', error)
+      setError(error.message || 'Failed to detect tenant')
+
+      // Fallback tenant to prevent crash
       const fallbackTenant: Tenant = {
         id: 'default',
         name: 'Default School',
@@ -58,32 +153,31 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
     }
   }, [])
 
+  // Initial detection
   useEffect(() => {
     void detectTenant()
-  }, [detectTenant])
 
-  const applyTenantTheme = (tenant: Tenant): void => {
-    const root = document.documentElement
-    if (tenant.theme_config) {
-      Object.entries(tenant.theme_config).forEach(([key, value]) => {
-        if (value && (key.startsWith('color') || key.includes('Color'))) {
-          // Set original key (e.g., --primaryColor)
-          root.style.setProperty(`--${key}`, value)
+    // Listed for auth changes to re-detect tenant
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, _session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        void detectTenant()
+      }
+    })
 
-          // Also set kebab-case (e.g., --primary-color) for SCSS compatibility
-          const kebabKey = key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
-          if (kebabKey !== key) {
-            root.style.setProperty(`--${kebabKey}`, value)
-          }
-        }
-      })
+    return () => {
+      subscription.unsubscribe()
     }
-  }
+  }, [detectTenant])
 
   const value: TenantContextType = {
     tenant,
     loading,
-    setTenant
+    error,
+    setTenant: (newTenant) => {
+      setTenant(newTenant)
+      applyTenantTheme(newTenant)
+    },
+    refreshTenant: detectTenant
   }
 
   return (

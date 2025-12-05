@@ -30,7 +30,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 }
 
 const TenantOnboarding: React.FC = () => {
-    const { logout } = useAuth()
+    const { user, logout } = useAuth()
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState<OnboardingData>({
@@ -161,7 +161,6 @@ const TenantOnboarding: React.FC = () => {
                 }
             }
 
-            // Save branding configuration to localStorage
             const brandingConfig = {
                 schoolName: data.schoolName,
                 primaryColor: data.primaryColor,
@@ -172,9 +171,8 @@ const TenantOnboarding: React.FC = () => {
             console.log('💾 Saving branding config:', brandingConfig)
             localStorage.setItem('tenant_branding', JSON.stringify(brandingConfig))
 
-            // Save tenant configuration
-            const tenantConfig = {
-                id: 'tenant-' + Date.now(),
+            // Prepare tenant data for database
+            const tenantData = {
                 name: data.schoolName,
                 subdomain: data.schoolName.toLowerCase().replace(/\s+/g, '-'),
                 theme_config: {
@@ -185,19 +183,57 @@ const TenantOnboarding: React.FC = () => {
                 active_modules: data.modules
             }
 
-            console.log('💾 Saving tenant config:', tenantConfig)
+            // Save to Supabase
+            const { supabase, tables } = await import('../../services/supabase')
+
+            console.log('💾 Saving tenant to Supabase:', tenantData)
+            const { data: savedTenant, error } = await supabase
+                .from(tables.tenants)
+                .insert([tenantData])
+                .select()
+                .single()
+
+            if (error) {
+                throw new Error(`Supabase error: ${error.message}`)
+            }
+
+            console.log('✅ Tenant saved successfully:', savedTenant)
+
+            // Link tenant to user profile
+            if (user) {
+                console.log('🔗 Linking tenant to user profile:', user.id)
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .update({
+                        tenant_id: savedTenant.id,
+                        role: 'admin' // Ensure they are the admin
+                    })
+                    .eq('id', user.id)
+
+                if (profileError) {
+                    console.error('❌ Error linking tenant to profile:', profileError)
+                    // Don't block flow, but log error
+                } else {
+                    console.log('✅ Profile linked successfully')
+                }
+            }
+
+            // Also save to localStorage for immediate access/fallback
+            const tenantConfig = {
+                id: savedTenant.id, // Use the ID from the database
+                ...tenantData
+            }
             localStorage.setItem('tenant_config', JSON.stringify(tenantConfig))
 
-            // Simulate saving configuration
-            await new Promise(resolve => setTimeout(resolve, 2000))
+            await new Promise(resolve => setTimeout(resolve, 1000))
 
             setLoading(false)
             // Force a hard redirect to ensure fresh state
             window.location.href = '/admin'
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ Error saving configuration:', error)
             setLoading(false)
-            alert('Failed to save configuration. Please try again.')
+            alert(`Failed to save configuration: ${error.message || 'Unknown error'}`)
         }
     }
 
@@ -229,6 +265,12 @@ const TenantOnboarding: React.FC = () => {
                 ? prev.modules.filter(m => m !== mod)
                 : [...prev.modules, mod]
         }))
+    }
+
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setData({ ...data, logo: e.target.files[0] })
+        }
     }
 
     const steps = [
@@ -605,7 +647,17 @@ const TenantOnboarding: React.FC = () => {
 
                                     <div className="form-field" style={{ marginTop: '1rem' }}>
                                         <label>School Logo</label>
-                                        <input type="file" className="file-input" accept="image/*" />
+                                        <input
+                                            type="file"
+                                            className="file-input"
+                                            accept="image/*"
+                                            onChange={handleLogoChange}
+                                        />
+                                        {data.logo && (
+                                            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#10b981' }}>
+                                                Selected: {data.logo.name}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -655,8 +707,10 @@ const TenantOnboarding: React.FC = () => {
                     ) : (
                         <button
                             onClick={handleFinish}
-                            disabled={loading}
+                            disabled={loading || !data.schoolName.trim()}
                             className="footer-button finish"
+                            title={!data.schoolName.trim() ? 'Please enter a school name' : ''}
+                            style={{ opacity: !data.schoolName.trim() ? 0.5 : 1, cursor: !data.schoolName.trim() ? 'not-allowed' : 'pointer' }}
                         >
                             {loading ? 'Saving...' : 'Launch Dashboard'} <Layout size={18} />
                         </button>

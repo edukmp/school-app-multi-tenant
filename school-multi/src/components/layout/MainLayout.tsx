@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTenant } from '../../contexts/TenantContext'
 import {
   LayoutDashboard,
   FileText,
@@ -21,6 +22,7 @@ interface NavItem {
 const MainLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { logout } = useAuth()
+  const { tenant } = useTenant()
   const location = useLocation()
 
   const navItems: NavItem[] = [
@@ -60,6 +62,10 @@ const MainLayout: React.FC = () => {
     }
   }
 
+  const logo = tenant?.theme_config?.logo
+  const schoolName = tenant?.name || 'School'
+  const initial = schoolName.charAt(0)
+
   return (
     <div className="app-shell">
       {/* Mobile Menu Toggle */}
@@ -82,7 +88,24 @@ const MainLayout: React.FC = () => {
 
       {/* Sidebar */}
       <aside className={`app-shell__sidebar ${isSidebarOpen ? 'app-shell__sidebar--open' : ''}`}>
-        <div className="sidebar__logo">S</div>
+        <div className="sidebar__logo" style={{
+          background: logo ? 'transparent' : 'var(--primary-color, #4f46e5)',
+          color: logo ? 'inherit' : 'white',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {logo ? (
+            <img
+              src={logo}
+              alt={schoolName}
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          ) : (
+            initial
+          )}
+        </div>
 
         <nav className="sidebar__nav">
           {navItems.map((item, index) => (

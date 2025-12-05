@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Users,
   GraduationCap,
@@ -12,39 +12,25 @@ import {
   Settings
 } from 'lucide-react'
 import '../../styles/admin-dashboard.scss'
-
-interface BrandingConfig {
-  schoolName: string
-  primaryColor: string
-  secondaryColor: string
-  logo: string | null
-}
+import { useTenant } from '../../contexts/TenantContext'
+import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 const AdminDashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState('week')
-  const [branding, setBranding] = useState<BrandingConfig>({
-    schoolName: 'School Management System',
-    primaryColor: '#667eea',
-    secondaryColor: '#764ba2',
-    logo: null
-  })
+  const { tenant, loading: tenantLoading } = useTenant()
 
-  // Load branding from localStorage
-  useEffect(() => {
-    try {
-      const savedBranding = localStorage.getItem('tenant_branding')
-      if (savedBranding) {
-        const parsed = JSON.parse(savedBranding)
-        setBranding(parsed)
+  // Use tenant data or defaults
+  const schoolName = tenant?.name || 'School Management System'
+  const logo = tenant?.theme_config?.logo || null
+  // Note: CSS variables are set globally by TenantContext
 
-        // Apply theme colors
-        document.documentElement.style.setProperty('--primary-color', parsed.primaryColor)
-        document.documentElement.style.setProperty('--secondary-color', parsed.secondaryColor)
-      }
-    } catch (error) {
-      console.error('Error loading branding:', error)
-    }
-  }, [])
+  if (tenantLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
 
   // Mock data - replace with real data from Supabase
   const stats = [
@@ -115,11 +101,27 @@ const AdminDashboard: React.FC = () => {
       {/* Header */}
       <div className="dashboard-header">
         <div className="dashboard-header-left">
-          {branding.logo && (
-            <img src={branding.logo} alt="School Logo" className="dashboard-logo" />
+          {logo ? (
+            <img src={logo} alt="School Logo" className="dashboard-logo" />
+          ) : (
+            <div className="dashboard-logo-placeholder" style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '8px',
+              background: 'var(--primary-color, #667eea)',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              flexShrink: 0
+            }}>
+              {schoolName.charAt(0)}
+            </div>
           )}
           <div>
-            <h1 className="dashboard-title">{branding.schoolName}</h1>
+            <h1 className="dashboard-title">{schoolName}</h1>
             <p className="dashboard-subtitle">Welcome back! Here's what's happening with your school.</p>
           </div>
         </div>
@@ -220,19 +222,19 @@ const AdminDashboard: React.FC = () => {
           <h2 className="card-title">Quick Actions</h2>
         </div>
         <div className="quick-actions-grid">
-          <button className="quick-action-btn">
+          <button className="quick-action-btn" onClick={() => alert('Add Student feature coming soon!')}>
             <Users size={20} />
             <span>Add Student</span>
           </button>
-          <button className="quick-action-btn">
+          <button className="quick-action-btn" onClick={() => alert('Schedule Event feature coming soon!')}>
             <Calendar size={20} />
             <span>Schedule Event</span>
           </button>
-          <button className="quick-action-btn">
+          <button className="quick-action-btn" onClick={() => alert('Upload Document feature coming soon!')}>
             <FileText size={20} />
             <span>Upload Document</span>
           </button>
-          <button className="quick-action-btn">
+          <button className="quick-action-btn" onClick={() => alert('Record Payment feature coming soon!')}>
             <DollarSign size={20} />
             <span>Record Payment</span>
           </button>

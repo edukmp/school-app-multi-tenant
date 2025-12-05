@@ -284,6 +284,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const supabaseKey = `sb-${new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0]}-auth-token`
         localStorage.removeItem(supabaseKey)
+        localStorage.removeItem('tenant_config')
+        localStorage.removeItem('tenant_branding')
       } catch (e) { console.warn('Could not clear local storage key', e) }
 
       // Redirect to landing page
