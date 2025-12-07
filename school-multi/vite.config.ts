@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
@@ -11,6 +10,33 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: {
         enabled: true
+      },
+      workbox: {
+        // Cache strategies for better offline support
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              }
+            }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          }
+        ]
       },
       manifest: {
         name: 'School App Multi-Tenant',
@@ -39,6 +65,72 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    // Target modern browsers for better optimization
+    target: 'es2015',
+
+    // Minification with terser
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+
+    // CSS optimization
+    cssCodeSplit: true,
+    cssMinify: true,
+
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'icons-vendor': ['lucide-react'],
+
+          // Feature chunks
+          'admin-pages': [
+            './src/pages/admin/AdminDashboard.tsx',
+            './src/pages/admin/students/StudentsList.tsx',
+            './src/pages/admin/students/StudentForm.tsx',
+            './src/pages/admin/students/StudentDetail.tsx'
+          ],
+          'placeholder-pages': [
+            './src/pages/admin/FinancePage.tsx',
+            './src/pages/admin/AcademicPage.tsx',
+            './src/pages/admin/TransportPage.tsx'
+          ],
+          'shared-pages': [
+            './src/pages/CalendarPage.tsx',
+            './src/pages/DocumentsPage.tsx',
+            './src/pages/SettingsPage.tsx'
+          ]
+        },
+        // Optimize chunk names
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+
+    chunkSizeWarningLimit: 1000,
+    assetsInlineLimit: 4096, // Inline assets < 4kb
+    reportCompressedSize: true
+  },
+
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      'lucide-react'
+    ]
+  },
+
   server: {
     port: 5173,
     host: '0.0.0.0',

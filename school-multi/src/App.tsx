@@ -34,6 +34,15 @@ import LoadingSpinner from './components/common/LoadingSpinner'
 import StudentsList from './pages/admin/students/StudentsList'
 import StudentForm from './pages/admin/students/StudentForm'
 import StudentDetail from './pages/admin/students/StudentDetail'
+// Placeholder Pages
+import TeachersList from './pages/admin/teachers/TeachersList'
+import TeacherForm from './pages/admin/teachers/TeacherForm'
+import TeacherDetail from './pages/admin/teachers/TeacherDetail'
+// Placeholder Pages
+// import TeachersPage from './pages/admin/TeachersPage'
+import FinancePage from './pages/admin/FinancePage'
+import AcademicPage from './pages/admin/AcademicPage'
+import TransportPage from './pages/admin/TransportPage'
 
 // Helper component for admin route protection
 const AdminRoute = ({ user }: { user: any }) => {
@@ -49,12 +58,20 @@ const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Auto-redirect admin users to onboarding if not already there
+  // Auto-redirect admin users based on profile status
   React.useEffect(() => {
-    if (!authLoading && user?.role === 'admin' && !location.pathname.startsWith('/tenant/onboarding') && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/help') && !location.pathname.startsWith('/auth')) {
-      navigate('/tenant/onboarding', { replace: true })
+    if (authLoading || !user || user.role !== 'admin') return
+
+    const isOnboarding = location.pathname.startsWith('/tenant/onboarding')
+
+
+    // If profile IS completed -> Prevent access to onboarding
+    if (user.is_profile_completed && isOnboarding) {
+      console.log('Redirecting complete admin to dashboard')
+      navigate('/admin', { replace: true })
     }
   }, [user, authLoading, location.pathname, navigate])
+
 
   if (authLoading || tenantLoading) {
     return <LoadingSpinner />
@@ -137,6 +154,19 @@ const App: React.FC = () => {
           <Route path="students/add" element={<StudentForm />} />
           <Route path="students/:id" element={<StudentDetail />} />
           <Route path="students/:id/edit" element={<StudentForm />} />
+          {/* Placeholder Pages */}
+          {/* Teachers Management */}
+          <Route path="teachers" element={<TeachersList />} />
+          <Route path="teachers/add" element={<TeacherForm />} />
+          <Route path="teachers/:id" element={<TeacherDetail />} />
+          <Route path="teachers/:id/edit" element={<TeacherForm />} />
+          <Route path="finance" element={<FinancePage />} />
+          <Route path="academic" element={<AcademicPage />} />
+          <Route path="transport" element={<TransportPage />} />
+          {/* Shared Pages */}
+          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="documents" element={<DocumentsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         {/* 404 Route */}

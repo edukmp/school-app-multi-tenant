@@ -164,6 +164,79 @@ export interface ParentStudentBinding {
   verified_at?: string
 }
 
+// Teacher Types
+export interface Teacher {
+  id: string
+  tenant_id: string
+
+  // Professional
+  nip: string
+  full_name: string
+  nickname?: string
+  title?: string
+
+  // Personal
+  gender?: 'male' | 'female'
+  birth_place?: string
+  birth_date?: string
+  religion?: string
+
+  // Contact
+  phone?: string
+  email?: string
+  address?: string
+  city?: string
+  province?: string
+  postal_code?: string
+
+  // Employment
+  employment_status?: 'permanent' | 'contract' | 'part_time' | 'honorary'
+  join_date?: string
+  qualification?: string
+  major?: string
+  university?: string
+
+  // Status
+  status: 'active' | 'inactive' | 'on_leave' | 'resigned'
+
+  // Additional
+  photo_url?: string
+  notes?: string
+  subjects?: string[]
+
+  // Metadata
+  created_at?: string
+  updated_at?: string
+  created_by?: string
+  updated_by?: string
+}
+
+export interface TeacherFormData {
+  nip: string
+  full_name: string
+  nickname?: string
+  title?: string
+  gender?: 'male' | 'female'
+  birth_place?: string
+  birth_date?: string
+  religion?: string
+  phone?: string
+  email?: string
+  address?: string
+  city?: string
+  province?: string
+  postal_code?: string
+  employment_status?: 'permanent' | 'contract' | 'part_time' | 'honorary'
+  join_date?: string
+  qualification?: string
+  major?: string
+  university?: string
+  status: 'active' | 'inactive' | 'on_leave' | 'resigned'
+  notes?: string
+  subjects?: string[]
+  photo_url?: string
+}
+
 // Meeting Types
 export interface Meeting {
   id: string

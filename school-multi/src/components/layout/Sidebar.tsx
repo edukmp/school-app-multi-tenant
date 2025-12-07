@@ -59,12 +59,12 @@ const Sidebar: React.FC = () => {
             label: 'Academic'
         },
         {
-            path: '/calendar',
+            path: '/admin/calendar',
             icon: <Calendar size={20} />,
             label: 'Calendar'
         },
         {
-            path: '/documents',
+            path: '/admin/documents',
             icon: <FileText size={20} />,
             label: 'Documents'
         },
@@ -136,7 +136,7 @@ const Sidebar: React.FC = () => {
             {/* Footer */}
             <div className="sidebar-footer">
                 <NavLink
-                    to="/settings"
+                    to="/admin/settings"
                     className={({ isActive }) => `menu-link ${isActive ? 'active' : ''}`}
                     title={collapsed ? 'Settings' : ''}
                 >

@@ -14,12 +14,14 @@ import {
 } from 'lucide-react'
 import '../../styles/admin-dashboard.scss'
 import { useTenant } from '../../contexts/TenantContext'
+import { useAuth } from '../../contexts/AuthContext'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate()
   const [timeRange, setTimeRange] = useState('week')
   const { tenant, loading: tenantLoading } = useTenant()
+  const { user } = useAuth()
 
   // Use tenant data or defaults
   const schoolName = tenant?.name || 'School Management System'
@@ -145,6 +147,25 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+
+      {/* Setup Alert */}
+      {
+        !user?.is_profile_completed && (
+          <div className="setup-alert">
+            <div className="alert-content">
+              <AlertCircle size={24} />
+              <div>
+                <h4>Setup Incomplete</h4>
+                <p>Please complete your school profile and branding setup.</p>
+              </div>
+            </div>
+            <button onClick={() => navigate('/tenant/onboarding')} className="btn btn-primary">
+              Complete Setup
+            </button>
+          </div>
+        )
+      }
+
       {/* Stats Grid */}
       <div className="stats-grid">
         {stats.map((stat, index) => {
@@ -242,7 +263,7 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

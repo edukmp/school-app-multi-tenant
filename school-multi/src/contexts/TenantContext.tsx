@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react'
 import { Tenant } from '../types'
 import { supabase } from '../services/supabase'
 import { generateThemePalette, applyThemePalette } from '../utils/colorTheming'
@@ -21,6 +21,13 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Use ref to track tenant state and avoid stale closures in useCallback
+  const tenantRef = useRef<Tenant | null>(null)
+
+  useEffect(() => {
+    tenantRef.current = tenant
+  }, [tenant])
 
   const applyTenantTheme = (tenant: Tenant): void => {
     if (tenant.theme_config) {
@@ -90,7 +97,10 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
   }
 
   const detectTenant = useCallback(async (): Promise<void> => {
-    setLoading(true)
+    // Only show loading if we don't have a tenant yet (Stale-while-revalidate)
+    if (!tenantRef.current) {
+      setLoading(true)
+    }
     setError(null)
 
     try {
